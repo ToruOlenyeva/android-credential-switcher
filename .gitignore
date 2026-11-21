@@ -1,0 +1,11 @@
+build/
+dist/
+*.apk
+*.idsig
+*.keystore
+*.jks
+*.tmp
+.DS_Store
+Thumbs.db
+.idea/
+.gradle/
