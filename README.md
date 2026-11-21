@@ -66,13 +66,20 @@ flowchart TD
 
 ## 🚀 快速安装与一次性授权
 
+> <b>为什么需要一次外部授权？</b>：`WRITE_SECURE_SETTINGS` 属于 Android 保护级系统权限，系统禁止任何应用在机身内部弹窗请求「允许」，必须由用户通过 `pm grant` 外部签发一次。<b>任选下方「方式 A（电脑）」或「方式 B（纯手机免电脑）」之一完成一次即可，此后可随时关闭调试模式并卸载临时工具，本应用权限永久保留。</b>
+
 ### 1. 下载并安装 APK
 
 前往 [GitHub Releases](https://github.com/ToruOlenyeva/android-credential-switcher/releases) 下载最新的 `android-credential-switcher-v1.0.0.apk` 并安装到手机。
 
-### 2. 通过 ADB 授予一次性 `WRITE_SECURE_SETTINGS` 权限
+### 2. 方式 A：通过电脑 USB 线一次性授权（最稳妥）
 
-在手机上临时打开「开发者选项 -> USB 调试」（部分小米 / MIUI 机型需同时打开「USB 调试（安全设置）」），连接电脑并在终端执行对应命令：
+1. 若电脑尚未安装 ADB，先下载官方 [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools) 并解压。
+2. 在手机上临时进入「开发者选项」开启对应调试开关：
+   - <b>小米 / HyperOS / MIUI</b>：开启「USB 调试」与 <b>「USB 调试（安全设置）」</b>
+   - <b>OPPO / 一加 / 真我（ColorOS）</b>：开启「USB 调试」与 <b>「禁止权限监控」</b>
+   - <b>vivo（OriginOS）/ 荣耀（MagicOS）/ Pixel / 三星</b>：开启「USB 调试」
+3. 用数据线连接电脑（手机弹窗点「允许 USB 调试」），在终端执行以下对应命令：
 
 <b>macOS / Linux</b>:
 ```bash
@@ -89,11 +96,33 @@ adb shell pm grant io.github.toruolenyeva.credswitcher android.permission.WRITE_
 adb shell pm grant io.github.toruolenyeva.credswitcher android.permission.WRITE_SECURE_SETTINGS
 ```
 
-### 3. 验证生效并关闭开发者选项
+### 3. 方式 B：纯手机免电脑一次性授权（无线调试跳板）
 
-打开「凭证服务管理」，确认顶部绿色徽章显示 <b>「● 已授予 WRITE_SECURE_SETTINGS · 离线永久生效」</b> 后，即可安全关闭「USB 调试」与「开发者选项」——权限会在重启后继续保留。
+身边没有电脑时，可直接在手机本地借助任意终端型 ADB 工具完成一次性授权：
 
-### 4. 可选：零 Gradle 从源码构建
+1. 在手机「开发者选项」中临时打开「无线调试」。
+2. 安装并打开一个本地 ADB 终端工具（例如 <b>LADB</b>，或 <b>Shizuku + aShell / Termux</b>），按指引输入 6 位配对码完成本机配对。
+3. 在该本地终端内执行以下指令（不需要 `adb shell` 前缀）：
+
+```bash
+pm grant io.github.toruolenyeva.credswitcher android.permission.WRITE_SECURE_SETTINGS
+```
+
+4. 确认生效后，可直接关闭「无线调试」与「开发者选项」，<b>Shizuku / LADB 等临时跳板工具也可立即卸载</b>，不会影响本应用的权限。
+
+### 4. 验证生效与权限生命周期
+
+打开「凭证服务管理」，确认顶部绿色徽章显示 <b>「● 已授予 WRITE_SECURE_SETTINGS · 离线永久生效」</b> 后，即可放心关闭「USB 调试」与「开发者选项」。
+
+| 常见场景 | 权限是否保留 | 是否需要重连电脑或重新授权 |
+| :--- | :--- | :--- |
+| <b>正常关机 / 重启手机</b> | 永久保留 | 无需 |
+| <b>关闭 USB 调试、无线调试与开发者选项</b> | 永久保留 | 无需 |
+| <b>覆盖升级安装本应用新版 APK</b> | 永久保留 | 无需 |
+| <b>系统 OTA 大版本 / 安全补丁升级</b> | 永久保留 | 无需（若默认服务被系统重置，点应用内「一键重刷配置到系统」即可） |
+| <b>更换新手机 / 卸载本应用重装 / 恢复出厂设置</b> | 需重新授权 | 仅需再执行一次上述方式 A 或方式 B |
+
+### 5. 可选：零 Gradle 从源码构建
 
 仅需安装 JDK 17+ 与 Android SDK（`android-34` 及以上平台 + Build-Tools），无需 Gradle：
 

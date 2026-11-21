@@ -66,13 +66,20 @@ flowchart TD
 
 ## 🚀 Quick Installation & One-Time Grant
 
+> <b>Why is an external grant required once?</b>: `WRITE_SECURE_SETTINGS` is an Android signature/development protection-level permission. Apps cannot ask for it with an in-app runtime popup—it must be issued once via `pm grant`. <b>Choose either Option A (PC) or Option B (PC-free on-device) below; once granted, you can turn off debugging and uninstall any helper app, and the permission stays active permanently.</b>
+
 ### 1. Download and Install APK
 
 Grab the latest `android-credential-switcher-v1.0.0.apk` from [GitHub Releases](https://github.com/ToruOlenyeva/android-credential-switcher/releases) and install it on your device.
 
-### 2. Grant `WRITE_SECURE_SETTINGS` Once via ADB
+### 2. Option A: One-Time Grant via PC USB (Recommended)
 
-Temporarily enable Developer Options and USB Debugging on your phone (on Xiaomi / MIUI / HyperOS devices, also enable "USB debugging (Security settings)"), connect to your PC, and run:
+1. If `adb` is not installed yet, download [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools) and extract it.
+2. Temporarily open Developer Options on your phone and enable the required debugging toggles:
+   - <b>Xiaomi / HyperOS / MIUI</b>: enable "USB debugging" and <b>"USB debugging (Security settings)"</b>
+   - <b>OPPO / OnePlus / Realme (ColorOS)</b>: enable "USB debugging" and <b>"Disable permission monitoring"</b>
+   - <b>vivo (OriginOS) / Honor (MagicOS) / Pixel / Samsung</b>: enable "USB debugging"
+3. Connect the phone over USB (accept the "Allow USB debugging" prompt), then run the command for your OS:
 
 <b>macOS / Linux</b>:
 ```bash
@@ -89,11 +96,33 @@ adb shell pm grant io.github.toruolenyeva.credswitcher android.permission.WRITE_
 adb shell pm grant io.github.toruolenyeva.credswitcher android.permission.WRITE_SECURE_SETTINGS
 ```
 
-### 3. Verify and Disable Developer Options
+### 3. Option B: PC-Free On-Device Grant (Wireless Debugging)
 
-Launch Credential Switcher and verify the green pill reads <b>"WRITE_SECURE_SETTINGS Granted · Offline Persistent"</b>. You can now safely turn off USB Debugging and Developer Options; the permission persists across reboots.
+If you do not have a computer handy, you can run the one-time grant directly on the phone using a local ADB shell app:
 
-### 4. Optional: Build from Source (Zero Gradle)
+1. Temporarily enable "Wireless debugging" in your phone's Developer Options.
+2. Install and pair a local ADB shell tool (such as <b>LADB</b>, or <b>Shizuku + aShell / Termux</b>) once using the 6-digit pairing code.
+3. Run the command below inside that local shell (without the `adb shell` prefix):
+
+```bash
+pm grant io.github.toruolenyeva.credswitcher android.permission.WRITE_SECURE_SETTINGS
+```
+
+4. After confirming the grant works, turn off Wireless debugging and Developer Options; <b>you can even uninstall Shizuku / LADB right away</b> without losing permission.
+
+### 4. Verification & Permission Lifecycle
+
+Open Credential Switcher and verify the green pill reads <b>"WRITE_SECURE_SETTINGS Granted · Offline Persistent"</b>. You can now safely disable USB Debugging and Developer Options.
+
+| Scenario | Permission Kept? | Re-Grant or Action Needed? |
+| :--- | :--- | :--- |
+| <b>Normal power off / reboot</b> | Kept permanently | None |
+| <b>Turn off USB Debugging, Wireless Debugging &amp; Developer Options</b> | Kept permanently | None |
+| <b>Update install over existing APK</b> | Kept permanently | None |
+| <b>System OTA / security patch update</b> | Kept permanently | None (tap "Re-Apply Config to System" in-app if the OEM resets defaults) |
+| <b>New device / uninstall &amp; reinstall / factory reset</b> | Must re-grant | Run Option A or Option B once again |
+
+### 5. Optional: Build from Source (Zero Gradle)
 
 Requires only JDK 17+ and Android SDK (platform `android-34` or higher + Build-Tools), with no Gradle installation needed:
 
